@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>iStore EastPark — Login</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#080d17;color:#e2e8f5;font-family:'DM Sans',system-ui,sans-serif;
+  min-height:100vh;display:flex;align-items:center;justify-content:center;}
+.login-wrap{width:100%;max-width:400px;padding:24px}
+.logo{text-align:center;margin-bottom:40px}
+.logo svg{width:48px;height:48px;margin-bottom:12px}
+.logo h1{font-size:22px;font-weight:600;color:#e2e8f5}
+.logo p{font-size:13px;color:#8a9ab5;margin-top:4px}
+.card{background:#0e1624;border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:32px}
+.field{margin-bottom:20px}
+.field label{display:block;font-size:12px;color:#8a9ab5;letter-spacing:.5px;margin-bottom:8px;text-transform:uppercase}
+.field input{width:100%;background:#141e2e;border:1px solid rgba(255,255,255,0.1);border-radius:10px;
+  padding:12px 16px;color:#e2e8f5;font-size:15px;outline:none;transition:border-color .2s}
+.field input:focus{border-color:rgba(59,130,246,0.5);box-shadow:0 0 0 3px rgba(59,130,246,0.1)}
+.field input::placeholder{color:#4a5878}
+.btn{width:100%;padding:13px;background:#3b82f6;border:none;border-radius:10px;
+  color:white;font-size:15px;font-weight:600;cursor:pointer;transition:background .2s;margin-top:8px}
+.btn:hover{background:#2563eb}
+.error{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);border-radius:8px;
+  padding:12px 16px;font-size:13px;color:#ef4444;margin-bottom:20px;display:none}
+.footer{text-align:center;margin-top:24px;font-size:12px;color:#4a5878}
+.badge{display:inline-flex;align-items:center;gap:6px;background:rgba(34,197,94,0.1);
+  border:1px solid rgba(34,197,94,0.2);border-radius:20px;padding:4px 12px;
+  font-size:11px;color:#22c55e;margin-bottom:24px}
+.badge::before{content:'';width:6px;height:6px;border-radius:50%;background:#22c55e;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+</style>
+</head>
+<body>
+<div class="login-wrap">
+  <div class="logo">
+    <svg viewBox="0 0 48 48" fill="none">
+      <rect width="48" height="48" rx="12" fill="#1a2640"/>
+      <path d="M12 34V18l12-8 12 8v16" stroke="#3b82f6" stroke-width="2" stroke-linejoin="round"/>
+      <rect x="19" y="24" width="10" height="10" rx="1" fill="#3b82f6" opacity=".6"/>
+      <path d="M20 20h8v4h-8z" fill="#3b82f6" opacity=".3"/>
+    </svg>
+    <h1>iStore EastPark</h1>
+    <p>Sales Performance Dashboard</p>
+  </div>
+  <div style="display:flex;justify-content:center">
+    <div class="badge">LIVE · Apr 2026</div>
+  </div>
+  <div class="card">
+    <div class="error" id="err">Incorrect username or password. Please try again.</div>
+    <div class="field">
+      <label>Username</label>
+      <input type="text" id="usr" placeholder="Enter your username" autocomplete="username" autocapitalize="none">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="pwd" placeholder="Enter your password" autocomplete="current-password">
+    </div>
+    <button class="btn" onclick="doLogin()">Sign In</button>
+  </div>
+  <div class="footer">iStore EastPark · MTS · Confidential</div>
+</div>
+<script>
+const USERS = {"nancy": {"pass": "Nancy2026!", "level": 1, "name": "Nancy Chaonza", "rep": "Nancy Chaonza", "role": "Sales Consultant", "store": "eastpark"}, "faith": {"pass": "Faith2026!", "level": 1, "name": "Faith Kapaaso", "rep": "Faith Kapaaso", "role": "Sales Consultant", "store": "eastpark"}, "cindy": {"pass": "Cindy2026!", "level": 1, "name": "Cindy Mpolomoka", "rep": "Cindy Mpolomoka", "role": "Sales Consultant", "store": "eastpark"}, "joseph": {"pass": "Joseph2026!", "level": 1, "name": "Mushota Joseph", "rep": "Mushota Joseph", "role": "Service Technician", "store": "eastpark"}, "japhet": {"pass": "Japhet2026!", "level": 1, "name": "Japhet Maseka", "rep": "Japhet Maseka", "role": "Service Technician", "store": "eastpark"}, "tao": {"pass": "Tao2026!", "level": 2, "name": "Tao Phiri", "rep": null, "role": "Supervisor", "store": "eastpark"}, "kilo": {"pass": "Kilo2026!", "level": 3, "name": "Mpukuta Muyoya", "rep": null, "role": "Manager", "store": "all"}};
+
+function doLogin(){
+  const u = document.getElementById('usr').value.trim().toLowerCase();
+  const p = document.getElementById('pwd').value;
+  const err = document.getElementById('err');
+  err.style.display = 'none';
+
+  const user = USERS[u];
+  if(!user || user.pass !== p){
+    err.style.display = 'block';
+    document.getElementById('pwd').value = '';
+    return;
+  }
+
+  // Store session
+  sessionStorage.setItem('istore_user', JSON.stringify({
+    username: u,
+    name: user.name,
+    level: user.level,
+    role: user.role,
+    rep: user.rep,
+    store: user.store
+  }));
+
+  window.location.href = 'dashboard.html';
+}
+
+// Enter key support
+document.addEventListener('keydown', e => {
+  if(e.key === 'Enter') doLogin();
+});
+</script>
+</body>
+</html>
