@@ -2804,23 +2804,32 @@ const USERS={
 let _session={role:'none', rep:null, name:''};
 
 function doLogin(){
-  const u=document.getElementById('loginUser').value.trim().toLowerCase();
-  const p=document.getElementById('loginPass').value.trim();
+  const uEl=document.getElementById('loginUser');
+  const pEl=document.getElementById('loginPass');
   const err=document.getElementById('loginError');
+  if(!uEl||!pEl||!err) return;
+  const u=uEl.value.trim().toLowerCase();
+  const p=pEl.value.trim();
+  // Check blocked
+  if(_adminUsers&&_adminUsers[u]&&_adminUsers[u].blocked){
+    err.textContent='\u26d4 Account blocked. Contact your manager.';
+    err.style.display='block';
+    setTimeout(()=>{err.style.display='none';err.textContent='Incorrect username or password.';},4000);
+    return;
+  }
   const user=USERS[u];
   if(user && user.pass===p){
-    // Store session
     _session={role:user.role, rep:user.rep, name:user.name};
-
-    // Fade out login overlay
+    if(_adminUsers&&_adminUsers[u]) _adminUsers[u].lastLogin=new Date().toLocaleTimeString();
     const overlay=document.getElementById('loginOverlay');
     overlay.style.transition='opacity .5s ease';
     overlay.style.opacity='0';
     setTimeout(()=>{overlay.style.display='none'; onLoginSuccess();},500);
   } else {
+    err.textContent='Incorrect username or password. Please try again.';
     err.style.display='block';
-    document.getElementById('loginPass').value='';
-    document.getElementById('loginPass').focus();
+    pEl.value='';
+    pEl.focus();
     setTimeout(()=>{err.style.display='none';},3000);
   }
 }
@@ -3561,24 +3570,9 @@ document.addEventListener('input', e=>{
   if(lbl&&v) lbl.style.color=cols[Math.min(str-1,4)];
 });
 
-// ── BLOCKED CHECK on login ──
-const _origDoLogin=doLogin;
-function doLogin(){
-  const u=document.getElementById('loginUser')?.value.trim().toLowerCase();
-  const users=getAdminUsers();
-  if(u&&users[u]&&users[u].blocked){
-    const err=document.getElementById('loginError');
-    err.textContent='⛔ This account has been blocked. Please contact your manager.';
-    err.style.display='block';
-    setTimeout(()=>{err.style.display='none';err.textContent='Incorrect username or password. Please try again.';},4000);
-    return;
-  }
-  _origDoLogin();
-  if(u&&users[u]) users[u].lastLogin=new Date().toLocaleTimeString();
-}
+// Blocked check merged into doLogin above
 
 // ══ INIT ══
-buildOverview();
 function getAdminUsers(){
   if(!_adminUsers){
     // Deep clone USERS into editable runtime store
